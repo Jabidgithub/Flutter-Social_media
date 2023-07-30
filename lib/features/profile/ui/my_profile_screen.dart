@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_social_media_app/features/profile/models/profile_user_model.dart';
 import 'package:flutter_social_media_app/features/profile/ui/activity_screen.dart';
+import 'package:flutter_social_media_app/features/profile/ui/more_option_screen.dart';
 import 'package:flutter_social_media_app/features/profile/ui/profile_videos_screen.dart';
 import 'package:flutter_social_media_app/features/profile/ui/visit_profile_screen.dart';
 
-class MyProfile extends StatelessWidget {
-  const MyProfile({super.key});
+class MyProfile extends StatefulWidget {
+  final UserData userData;
+
+  const MyProfile({super.key, required this.userData});
+
+  @override
+  State<MyProfile> createState() => _MyProfileState();
+}
+
+class _MyProfileState extends State<MyProfile> {
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text(
-          "Ahmed Jabid Hasan",
-          style: TextStyle(
+        title: Text(
+          "${widget.userData.name}",
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -31,7 +42,7 @@ class MyProfile extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage('assets/imgs/avatar.png'),
+                backgroundImage: NetworkImage(widget.userData.avatar),
               ),
               const SizedBox(
                 height: 20,
@@ -109,7 +120,9 @@ class MyProfile extends StatelessWidget {
                 height: 30,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  toMorePage(context, widget.userData);
+                },
                 child: Container(
                   width: 100,
                   height: 40,
@@ -117,15 +130,16 @@ class MyProfile extends StatelessWidget {
                     color: Colors.redAccent,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Center(
-                      child: Text(
-                    "Log out",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  child: const Center(
+                    child: Text(
+                      "More",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  )),
+                  ),
                 ),
               ),
             ],
@@ -134,4 +148,26 @@ class MyProfile extends StatelessWidget {
       ),
     );
   }
+}
+
+toMorePage(context, userData) {
+  Navigator.push(
+      context,
+      PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => MoreOptions(
+                userData: userData,
+              ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            var begin = Offset(1.0, 0.0);
+            var end = Offset.zero;
+            var curve = Curves.ease;
+
+            var tween =
+                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            );
+          }));
 }

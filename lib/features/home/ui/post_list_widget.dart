@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_social_media_app/features/home/models/post_model.dart';
 
 class PostTileWidget extends StatelessWidget {
-  const PostTileWidget({super.key});
+  final Post postData;
+  // const PostTileWidget({super.key, required this.postData});
+  const PostTileWidget({Key? key, required this.postData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +28,8 @@ class PostTileWidget extends StatelessWidget {
                   CircleAvatar(
                     radius: 15,
                     child: ClipOval(
-                      child: Image.asset(
-                        'assets/imgs/avatar.png',
+                      child: Image.network(
+                        postData.pictures[0].toString(),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -34,27 +37,27 @@ class PostTileWidget extends StatelessWidget {
                   const SizedBox(
                     width: 10,
                   ),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           Text(
-                            "Ahmed Jabid Hasan",
+                            postData.userId.toString(),
                             style: TextStyle(
                                 fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
                             width: 10,
                           ),
-                          Text("3h"),
+                          Text(postData.createAt.toString()),
                         ],
                       ),
                       SizedBox(
                         height: 5,
                       ),
                       Text(
-                        "Programmer",
+                        postData.title.toString(),
                         style: TextStyle(fontSize: 10, color: Colors.grey),
                       ),
                     ],
@@ -69,7 +72,7 @@ class PostTileWidget extends StatelessWidget {
           ),
           Container(
             child: Text(
-              "The standard ListView constructor works well for small lists. To work with lists that contain a large number of items, it’s best to use the ListView.builder constructor In contrast to the default ListView constructor, which requires creating all items at once, the ListView.builder() constructor creates items as they’re scrolled onto the screen",
+              postData.description.toString(),
             ),
           ),
           SizedBox(
@@ -78,8 +81,8 @@ class PostTileWidget extends StatelessWidget {
           Container(
             height: 200,
             width: double.maxFinite,
-            child: Image.asset(
-              "assets/imgs/jabid.jpg",
+            child: Image.network(
+              postData.pictures[0],
               fit: BoxFit.cover,
             ),
           ),
