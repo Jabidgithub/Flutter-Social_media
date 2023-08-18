@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_social_media_app/features/profile/models/profile_user_model.dart';
-import 'package:flutter_social_media_app/features/profile/repos/profile_repository.dart';
+import 'package:flutter_social_media_app/logics/Auth_bloc/bloc_login/login_bloc.dart';
+import 'package:flutter_social_media_app/utiles/widgets/animated_loading.dart';
 
 class MoreOptions extends StatefulWidget {
   final UserData userData;
@@ -12,8 +14,6 @@ class MoreOptions extends StatefulWidget {
 }
 
 class _MoreOptionsState extends State<MoreOptions> {
-  final ProfileRepository profileRepository = ProfileRepository();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,32 +215,94 @@ class _MoreOptionsState extends State<MoreOptions> {
             const SizedBox(
               height: 10,
             ),
-            InkWell(
-              onTap: () async {
-                await profileRepository.clearSharedPreferences();
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/',
-                  (Route<dynamic> route) => false,
+            BlocConsumer<LoginBloc, LoginState>(
+              listener: (context, state) {
+                if (state is LogoutDoneState) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/',
+                    (Route<dynamic> route) => false,
+                  );
+                } else if (state is LoginErrorState) {
+                  print("${state.errorMessage}");
+                }
+              },
+              builder: (context, state) {
+                if (state is LogoutLoadingState) {
+                  return const Center(
+                    child: AnimatedLoader(),
+                  );
+                }
+                return InkWell(
+                  onTap: () async {
+                    BlocProvider.of<LoginBloc>(context).add(LogOutEvent());
+                  },
+                  child: Container(
+                    width: 100,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Center(
+                        child: Text(
+                      "Log out",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    )),
+                  ),
                 );
               },
-              child: Container(
-                width: 100,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Center(
-                    child: Text(
-                  "Log out",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            BlocConsumer<LoginBloc, LoginState>(
+              listener: (context, state) {
+                if (state is DeleteDoneState) {
+                  print("Deleted Reached");
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/',
+                    (Route<dynamic> route) => false,
+                  );
+                } else if (state is DeleteErrorState) {
+                  print("${state.errorMessage}");
+                }
+              },
+              builder: (context, state) {
+                if (state is DeleteLoadingState) {
+                  return const Center(
+                    child: AnimatedLoader(),
+                  );
+                }
+                return InkWell(
+                  onTap: () async {
+                    BlocProvider.of<LoginBloc>(context)
+                        .add(DeleteAccountEvent());
+                  },
+                  child: Container(
+                    width: 100,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Center(
+                        child: Text(
+                      "Delete User",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    )),
                   ),
-                )),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -248,10 +310,3 @@ class _MoreOptionsState extends State<MoreOptions> {
     );
   }
 }
-
-// void restartApp() {
-//   // The `exit` function will perform a hot restart in development mode
-//   if (Platform.isAndroid || Platform.isIOS) {
-//     exit(0);
-//   }
-// }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_social_media_app/features/auth/bloc/authentication_bloc.dart';
-import 'package:flutter_social_media_app/features/auth/repos/authentication_repository.dart';
-import 'package:flutter_social_media_app/features/home/logic/bloc/allposts_bloc.dart';
-import 'package:flutter_social_media_app/features/home/logic/bloc/home_bloc.dart';
-import 'package:flutter_social_media_app/features/home/repos/home_repository.dart';
+import 'package:flutter_social_media_app/logics/Auth_bloc/bloc_check_user/check_user_bloc.dart';
 import 'package:flutter_social_media_app/features/home/ui/home_screen.dart';
-import 'package:flutter_social_media_app/features/profile/bloc/profile_bloc.dart';
-import 'package:flutter_social_media_app/features/profile/repos/profile_repository.dart';
+import 'package:flutter_social_media_app/logics/Auth_bloc/bloc_email_verify/email_verify_bloc.dart';
+import 'package:flutter_social_media_app/logics/Auth_bloc/bloc_login/login_bloc.dart';
+import 'package:flutter_social_media_app/logics/Home_bloc/other_profile_bloc/other_profile_bloc.dart';
+import 'package:flutter_social_media_app/logics/Home_bloc/post_bloc/post_bloc.dart';
+import 'package:flutter_social_media_app/logics/Home_bloc/profile_bloc/home_bloc.dart';
+import 'package:flutter_social_media_app/logics/cubit/like_cubit/like_cubit.dart';
+import 'package:flutter_social_media_app/repositories/authentication_repository.dart';
+import 'package:flutter_social_media_app/repositories/home_repository.dart';
 import 'package:flutter_social_media_app/utiles/my_bloc_observer.dart';
 import 'package:flutter_social_media_app/utiles/widgets/animated_loading.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -29,17 +31,16 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthenticationBloc(AuthenticationRepository()),
+          create: (context) => CheckUserBloc(HomeRepository()),
         ),
         BlocProvider(
-          create: (context) => ProfileBloc(ProfileRepository()),
-        ),
+            create: (context) => EmailVerifyBloc(AuthenticationRepository())),
         BlocProvider(
-          create: (context) => HomeBloc(HomeRepository()),
-        ),
-        BlocProvider(
-          create: (context) => AllpostsBloc(HomeRepository()),
-        ),
+            create: (context) => LoginBloc(AuthenticationRepository())),
+        BlocProvider(create: (context) => PostBloc(HomeRepository())),
+        BlocProvider(create: (context) => HomeBloc(HomeRepository())),
+        BlocProvider(create: (context) => OtherProfileBloc(HomeRepository())),
+        BlocProvider(create: (context) => LikeCubit(HomeRepository())),
       ],
       child: MaterialApp(
         home: Builder(builder: (context) {
@@ -54,16 +55,16 @@ class MyApp extends StatelessWidget {
                   ),
                 );
               } else {
-                return BlocBuilder<ProfileBloc, ProfileState>(
+                return BlocBuilder<CheckUserBloc, CheckUserState>(
                   builder: (context, state) {
                     switch (state.runtimeType) {
-                      case UserCheckingState:
+                      case CheckingUsersExistenceState:
                         return const AnimatedLoader();
 
-                      case UserCurrentState:
-                        if ((state as UserCurrentState).userExist == true) {
+                      case CheckUserExistState:
+                        if ((state as CheckUserExistState).UserExist == true) {
                           return const HomeScreen();
-                        } else if ((state as UserCurrentState).userExist ==
+                        } else if ((state as CheckUserExistState).UserExist ==
                             false) {
                           return const AuthScreen();
                         }
@@ -86,6 +87,6 @@ class MyApp extends StatelessWidget {
   Future<void> checkUserExist(BuildContext context) async {
     await Future.delayed(
         const Duration(seconds: 2)); // Simulating some asynchronous operation
-    BlocProvider.of<ProfileBloc>(context).add(CheckUserExistEvent());
+    BlocProvider.of<CheckUserBloc>(context).add(CheckUserExistEvent());
   }
 }

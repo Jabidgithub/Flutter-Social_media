@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_social_media_app/features/profile/models/profile_user_model.dart';
 import 'package:flutter_social_media_app/features/profile/ui/activity_screen.dart';
 import 'package:flutter_social_media_app/features/profile/ui/more_option_screen.dart';
+import 'package:flutter_social_media_app/features/profile/ui/profile_posts_screen.dart';
 import 'package:flutter_social_media_app/features/profile/ui/profile_videos_screen.dart';
-import 'package:flutter_social_media_app/features/profile/ui/visit_profile_screen.dart';
 
 class MyProfile extends StatefulWidget {
   final UserData userData;
@@ -15,8 +15,6 @@ class MyProfile extends StatefulWidget {
 }
 
 class _MyProfileState extends State<MyProfile> {
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +64,14 @@ class _MyProfileState extends State<MyProfile> {
                     MediaQuery.of(context).size.width, // Specify a fixed width
                 height:
                     MediaQuery.of(context).size.width, // Specify a fixed height
-                child: Analytics(),
+                child: Analytics(
+                  comments: 5,
+                  followers: widget.userData.count.followers.toDouble(),
+                  followings: widget.userData.count.following.toDouble(),
+                  likes: widget.userData.count.reacts.toDouble(),
+                  posts: widget.userData.count.posts.toDouble(),
+                  videos: widget.userData.count.posts.toDouble(),
+                ),
               ),
               const SizedBox(
                 height: 20,
@@ -79,9 +84,13 @@ class _MyProfileState extends State<MyProfile> {
                       IconButton(
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProfileVideos()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfileVideos(
+                                  userId: widget.userData.id,
+                                ),
+                              ),
+                            );
                           },
                           icon: Icon(Icons.video_library_sharp)),
                       const Text(
@@ -101,7 +110,7 @@ class _MyProfileState extends State<MyProfile> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => VisitProfile()));
+                                    builder: (context) => UsersAllPosts()));
                           },
                           icon: Icon(Icons.post_add_outlined)),
                       const Text(

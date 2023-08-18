@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_social_media_app/features/auth/bloc/authentication_bloc.dart';
 import 'package:flutter_social_media_app/features/home/ui/home_screen.dart';
+import 'package:flutter_social_media_app/logics/Auth_bloc/bloc_login/login_bloc.dart';
 import 'package:flutter_social_media_app/utiles/constants/constants.dart';
 import 'package:flutter_social_media_app/utiles/widgets/text_input_filed.dart';
 import 'package:geocoding/geocoding.dart';
@@ -186,11 +186,9 @@ class _AuthSignUpState extends State<AuthSignUp> {
               const SizedBox(
                 height: 20,
               ),
-              BlocConsumer<AuthenticationBloc, AuthenticationState>(
-                  listener: (context, state) {
+              BlocConsumer<LoginBloc, LoginState>(listener: (context, state) {
                 if (state is SignUpSuccessState) {
-                  BlocProvider.of<AuthenticationBloc>(context)
-                      .add(FetchUserDataEvent());
+                  BlocProvider.of<LoginBloc>(context).add(FetchUserDataEvent());
                 } else if (state is SignUpFailureState) {
                   String errorMessage = 'SignUp Error. Please try again later.';
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -217,7 +215,7 @@ class _AuthSignUpState extends State<AuthSignUp> {
                 } else {
                   return InkWell(
                     onTap: () {
-                      BlocProvider.of<AuthenticationBloc>(context).add(
+                      BlocProvider.of<LoginBloc>(context).add(
                           SignUpButtonPressedEvent(
                               name: _userNameController.text,
                               location: _location!,

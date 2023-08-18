@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_social_media_app/features/auth/bloc/authentication_bloc.dart';
-import 'package:flutter_social_media_app/features/auth/ui/auth_email.dart';
 import 'package:flutter_social_media_app/features/auth/ui/auth_signup.dart';
 import 'package:flutter_social_media_app/features/home/ui/home_screen.dart';
+import 'package:flutter_social_media_app/logics/Auth_bloc/bloc_login/login_bloc.dart';
 import 'package:flutter_social_media_app/utiles/constants/constants.dart';
 import 'package:flutter_social_media_app/utiles/widgets/text_input_filed.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -49,11 +48,16 @@ class _AuthPasswordState extends State<AuthPassword> {
             const SizedBox(
               height: 20,
             ),
-            BlocConsumer<AuthenticationBloc, AuthenticationState>(
+            BlocConsumer<LoginBloc, LoginState>(
               listener: (_, state) {
                 if (state is LoginSuccessState && widget.userStatus == 'old') {
-                  BlocProvider.of<AuthenticationBloc>(context)
-                      .add(FetchUserDataEvent());
+                  BlocProvider.of<LoginBloc>(context).add(FetchUserDataEvent());
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                  );
                 } else if (state is LoginSuccessState &&
                     widget.userStatus == 'new') {
                   Navigator.pushReplacement(
@@ -84,7 +88,7 @@ class _AuthPasswordState extends State<AuthPassword> {
                 }
               },
               builder: (context, state) {
-                if (state is LogingLoadingState) {
+                if (state is LoginLoadingState) {
                   return Center(
                     child: LoadingAnimationWidget.hexagonDots(
                       color: Colors.red,
@@ -97,7 +101,7 @@ class _AuthPasswordState extends State<AuthPassword> {
                       print("Password: ${_passwordController.text} ");
                       print("Email: ${widget.email} ");
 
-                      BlocProvider.of<AuthenticationBloc>(context).add(
+                      BlocProvider.of<LoginBloc>(context).add(
                         LoginButtonPressedEvent(
                           email: widget.email,
                           password: _passwordController.text.trim(),

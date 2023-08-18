@@ -1,38 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_social_media_app/features/home/ui/post_list_widget.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_social_media_app/features/profile/ui/users_post_tile_widget.dart';
+import 'package:flutter_social_media_app/logics/Home_bloc/post_bloc/post_bloc.dart';
+import 'package:flutter_social_media_app/utiles/widgets/animated_loading.dart';
 
-class ProfilePosts extends StatelessWidget {
-  const ProfilePosts({super.key});
+class UsersAllPosts extends StatefulWidget {
+  final String? userAccessId;
+  const UsersAllPosts({
+    super.key,
+    this.userAccessId,
+  });
+
+  @override
+  State<UsersAllPosts> createState() => _UsersAllPostsState();
+}
+
+class _UsersAllPostsState extends State<UsersAllPosts> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    BlocProvider.of<PostBloc>(context)
+        .add(LoadUsersPostsEvent(widget.userAccessId));
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() async {
+    if (_scrollController.position.atEdge &&
+        _scrollController.position.pixels != 0) {
+      BlocProvider.of<PostBloc>(context)
+          .add(LoadUsersPostsEvent(widget.userAccessId));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           "Posts",
           style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
+            fontSize: 20,
             color: Colors.black,
           ),
         ),
+        iconTheme: IconThemeData(color: Colors.redAccent),
+        backgroundColor: Colors.white,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.redAccent),
       ),
-      body: Container(
-        child: Column(
-          children: [
-            Flexible(
-              child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  // return PostTileWidget();
-                },
-              ),
-            ),
-          ],
-        ),
+      body: BlocBuilder<PostBloc, PostState>(
+        builder: (context, state) {
+          switch (state.runtimeType) {
+            case usersAllpostsLoadingState:
+              return AnimatedLoader();
+            case usersallpostsLoadedState:
+              final loadedState = state as usersallpostsLoadedState;
+              return Container(
+                child: Column(
+                  children: [
+                    Flexible(
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: loadedState.allPosts.length,
+                        itemBuilder: (context, index) {
+                          return UsersPostTileWidget(
+                              postData: loadedState.allPosts[index]);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            default:
+              return AnimatedLoader();
+          }
+        },
       ),
     );
   }

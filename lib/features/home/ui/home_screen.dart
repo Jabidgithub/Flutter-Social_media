@@ -1,9 +1,9 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_social_media_app/features/home/logic/bloc/home_bloc.dart';
 import 'package:flutter_social_media_app/features/home/ui/notification_screen.dart';
 import 'package:flutter_social_media_app/features/profile/ui/my_profile_screen.dart';
+import 'package:flutter_social_media_app/logics/Home_bloc/profile_bloc/home_bloc.dart';
 import 'package:flutter_social_media_app/utiles/constants/constants.dart';
 import 'package:flutter_social_media_app/utiles/widgets/animated_loading.dart';
 
@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<HomeBloc>(context).add(HomeLoadDataEvent());
+    BlocProvider.of<HomeBloc>(context).add(HomeUserDataLoadingEvent());
   }
 
   @override
@@ -28,8 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
         switch (state.runtimeType) {
-          case HomeScreenLoaded:
-            final successState = state as HomeScreenLoaded;
+          case HomeUserDataLoadedState:
+            final successState = state as HomeUserDataLoadedState;
 
             return Scaffold(
               appBar: AppBar(
@@ -121,10 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // drawer: ,
             );
-          case HomeScreenLoading:
+          case HomeUserDataLoadingState:
             return AnimatedLoader();
           default:
-            return SizedBox();
+            // Error Page
+            return AnimatedLoader();
         }
       },
     );

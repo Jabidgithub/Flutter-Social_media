@@ -1,75 +1,265 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_social_media_app/features/videos/models/video_model.dart';
+import 'package:flutter_social_media_app/features/videos/ui/upload_video.dart';
+import 'package:flutter_social_media_app/repositories/home_repository.dart';
+import 'package:video_player/video_player.dart';
 
-class ProfileVideos extends StatelessWidget {
-  const ProfileVideos({super.key});
+class ProfileVideos extends StatefulWidget {
+  final String userId;
+  const ProfileVideos({super.key, required this.userId});
+
+  @override
+  State<ProfileVideos> createState() => _ProfileVideosState();
+}
+
+class _ProfileVideosState extends State<ProfileVideos> {
+  final HomeRepository homeRepository = HomeRepository();
+  // bool _isPlaying = false;
+  late PageController _pageController;
+  late List<Video> _videos = [];
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _loadVideos();
+  }
+
+  Future<void> _loadVideos() async {
+    try {
+      final videos = await homeRepository.getUsersAllVideos(widget.userId);
+      setState(() {
+        _videos = videos;
+      });
+    } catch (e) {
+      print('Error loading videos: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          "Videos",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
+    if (_videos.isEmpty) {
+      return Scaffold(
+        body: Center(
+          child: const Text("No videos available"),
+        ),
+      );
+    } else {
+      return Scaffold(
+        body: PageView.builder(
+          controller: _pageController,
+          itemCount: _videos.length,
+          scrollDirection: Axis.vertical,
+          onPageChanged: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          itemBuilder: (context, index) {
+            final video = _videos[_currentIndex];
+
+            return VideoItem(
+              video: video,
+              onPageChanged: (int newPage) {
+                if (newPage == index + 1) {
+                  _pageController.jumpToPage(0);
+                }
+              },
+            );
+          },
+        ),
+      );
+    }
+  }
+}
+
+class VideoItem extends StatefulWidget {
+  final Video video;
+  final ValueChanged<int> onPageChanged;
+
+  VideoItem({
+    required this.video,
+    required this.onPageChanged,
+  });
+
+  @override
+  _VideoItemState createState() => _VideoItemState();
+}
+
+class _VideoItemState extends State<VideoItem> {
+  late VideoPlayerController _videoPlayerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoPlayerController =
+        VideoPlayerController.network(widget.video.videoUrl)
+          ..initialize().then((value) {
+            setState(() {
+              _videoPlayerController.setLooping(true);
+            });
+          });
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Container(
             color: Colors.black,
+            child: _videoPlayerController.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: _videoPlayerController.value.aspectRatio,
+                    child: VideoPlayer(_videoPlayerController),
+                  )
+                : Container(),
           ),
         ),
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.redAccent),
-      ),
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 20,
-            ),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage("assets/imgs/avatar.png"),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Text(
-              "Creations",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.redAccent,
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: double.infinity,
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const ScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 5,
-                      mainAxisSpacing: 5,
-                    ),
-                    itemCount: 15,
-                    itemBuilder: (context, index) {
-                      return Image.asset('assets/imgs/video.jpg');
-                    },
-                  ),
+        // Other UI components here
+
+        Positioned(
+          top: MediaQuery.of(context).size.height * 0.3,
+          right: 20,
+          child: Container(
+            width: 50,
+            height: 400,
+            color: Colors.transparent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(widget.video.user.avatar),
                 ),
-              ),
-            )
-          ],
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.favorite),
+                      color: Colors.white,
+                    ),
+                    Text(
+                      "10",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.message_outlined),
+                      color: Colors.white,
+                    ),
+                    Text(
+                      "10",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.reply_outlined),
+                      color: Colors.white,
+                    ),
+                    Text("10", style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => VideoUploadScreen()),
+                        );
+                      },
+                      icon: Icon(Icons.add),
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.keyboard_double_arrow_left_outlined,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                  onPressed: () {
+                    _videoPlayerController.seekTo(
+                      Duration(
+                        seconds:
+                            _videoPlayerController.value.position.inSeconds -
+                                10,
+                      ),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    _videoPlayerController.value.isPlaying
+                        ? Icons.pause
+                        : Icons.play_arrow,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                  onPressed: () {
+                    if (_videoPlayerController.value.isPlaying) {
+                      _videoPlayerController.pause();
+                    } else {
+                      _videoPlayerController.play();
+                    }
+                    setState(() {});
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.keyboard_double_arrow_right_outlined,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                  onPressed: () {
+                    _videoPlayerController.seekTo(
+                      Duration(
+                        seconds:
+                            _videoPlayerController.value.position.inSeconds +
+                                10,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

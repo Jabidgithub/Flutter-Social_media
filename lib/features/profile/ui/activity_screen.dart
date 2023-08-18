@@ -2,18 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class Analytics extends StatelessWidget {
-  const Analytics({super.key});
+  final double followers;
+  final double followings;
+  final double likes;
+  final double comments;
+  final double videos;
+  final double posts;
+  const Analytics(
+      {super.key,
+      required this.followers,
+      required this.followings,
+      required this.likes,
+      required this.comments,
+      required this.videos,
+      required this.posts});
 
   @override
   Widget build(BuildContext context) {
     final List<ChartData> chartData = [
-      ChartData('Followers', 100),
-      ChartData('Followings', 120),
-      ChartData('Likes', 225),
-      ChartData('Comments', 86),
-      ChartData('Views', 129),
-      ChartData('Videos', 52),
-      ChartData('Posts', 52),
+      ChartData('Followers', followers),
+      ChartData('Followings', followings),
+      ChartData('Likes', likes),
+      ChartData('Comments', comments),
+      ChartData('Views', 5),
+      ChartData('Videos', videos),
+      ChartData('Posts', posts),
     ];
     return Container(
       child: Center(

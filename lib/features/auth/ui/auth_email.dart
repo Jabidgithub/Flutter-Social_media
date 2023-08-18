@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_social_media_app/features/auth/bloc/authentication_bloc.dart';
 import 'package:flutter_social_media_app/features/auth/ui/auth_password.dart';
+import 'package:flutter_social_media_app/logics/Auth_bloc/bloc_email_verify/email_verify_bloc.dart';
 import 'package:flutter_social_media_app/utiles/constants/constants.dart';
+import 'package:flutter_social_media_app/utiles/widgets/animated_loading.dart';
 import 'package:flutter_social_media_app/utiles/widgets/text_input_filed.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -73,9 +74,9 @@ class _AuthEmailState extends State<AuthEmail> {
             const SizedBox(
               height: 20,
             ),
-            BlocConsumer<AuthenticationBloc, AuthenticationState>(
+            BlocConsumer<EmailVerifyBloc, EmailVerifyState>(
               listener: (context, state) {
-                if (state is AuthenticationResult && state.info == 'success') {
+                if (state is EmailCheckResultState && state.info == 'success') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -88,18 +89,15 @@ class _AuthEmailState extends State<AuthEmail> {
                 }
               },
               builder: (context, state) {
-                if (state is AuthenticationLoading) {
-                  return Center(
-                    child: LoadingAnimationWidget.hexagonDots(
-                      color: Colors.red,
-                      size: 40,
-                    ),
+                if (state is EmailCheckingState) {
+                  return const Center(
+                    child: AnimatedLoader(),
                   );
                 } else {
                   return InkWell(
                     onTap: () {
-                      BlocProvider.of<AuthenticationBloc>(context)
-                          .add(CheckEmailEvent(email: _emailController.text));
+                      BlocProvider.of<EmailVerifyBloc>(context).add(
+                          EmailVerifyingEvent(email: _emailController.text));
                     },
                     borderRadius: BorderRadius.circular(10),
                     splashColor: AppColors.buttonColor.withOpacity(0.5),
