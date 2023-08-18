@@ -1,16 +1,63 @@
-# flutter_social_media_app
 
-A new Flutter project.
+# Orbit Social Media App
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Acknowledgements
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ - [Bloc / Cubit](https://pub.dev/packages/bloc)
+ - [Node js / Express js ](https://nodejs.org/en)
+ - [SQL](https://www.w3schools.com/sql//449-how-to-write-a-good-readme-for-your-github-project)
+
+
+## API Reference
+
+#### Get all items
+
+```http
+  Base API https://orbit-a3ph.onrender.com/api/v1/
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `All Users` | `GET` | users?userId&profileSize |
+| `User Info` | `PUT` | /userinfo |
+| `Login Info` | `POST` | /getaccess |
+| `Fined A User` | `GET` | /user/${userId} |
+| `Email Verify` | `POST` | /emailverification |
+| `Delete User` | `Delete` | /user/${userId} |
+| `Follow` | `PUT` | /follow |
+
+## See others APIS in the Project
+
+
+
+
+## Demo
+
+
+
+
+## Screenshots
+
+# My Project Screenshots
+# ScreenShots
+
+
+
+| Screenshot 1 | Screenshot 2 |
+|:------------:|:------------:|
+| ![1](https://raw.githubusercontent.com/Jabidgithub/Flutter-Social_media/main/assets/ScreenShots/Screenshot_20230819-010534.jpg) | ![2](https://raw.githubusercontent.com/Jabidgithub/Flutter-Social_media/main/assets/ScreenShots/Screenshot_20230819-010553.jpg) |
+
+| Screenshot 3 | Screenshot 4 |
+|:------------:|:------------:|
+| ![3](https://github.com/Jabidgithub/Flutter-Social_media/blob/main/assets/ScreenShots/Screenshot_20230819-011029.jpg) | ![4](https://github.com/Jabidgithub/Flutter-Social_media/blob/main/assets/ScreenShots/Screenshot_20230819-011043.jpg) |
+| Screenshot 5 | Screenshot 6 |
+|:------------:|:------------:|
+| ![5](https://raw.githubusercontent.com/Jabidgithub/Flutter-Social_media/main/assets/ScreenShots/Screenshot_20230819-011125.jpg) | ![4](https://raw.githubusercontent.com/Jabidgithub/Flutter-Social_media/main/assets/ScreenShots/Screenshot_20230819-011134.jpg) |
+| Screenshot 7 | Screenshot 8 |
+|:------------:|:------------:|
+| ![7](https://raw.githubusercontent.com/Jabidgithub/Flutter-Social_media/main/assets/ScreenShots/Screenshot_20230819-011209.jpg) | ![8](https://raw.githubusercontent.com/Jabidgithub/Flutter-Social_media/main/assets/ScreenShots/Screenshot_20230819-011652.jpg) |
+
+
